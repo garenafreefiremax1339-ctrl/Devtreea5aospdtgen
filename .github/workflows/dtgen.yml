@@ -1,0 +1,55 @@
+name: Generate AOSP Device Tree from Recovery ZIP
+
+on:
+  workflow_dispatch:
+    inputs:
+        firmware_url:
+          description: 'Link download Recovery ROM (.zip)'
+          required: true
+          default: 'https://cdnorg.d.miui.com/A15.0.11.0.VGWIDXM/miui_SERENITYIDGlobal_A15.0.11.0.VGWIDXM_3c861cb965_15.0.zip'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Install Tools (aospdtgen & payload-dumper)
+        run: |
+          pip install aospdtgen
+          go install github.com/ssut/payload-dumper-go@latest
+          echo "$(go env GOPATH)/bin" >> $GITHUB_PATH
+
+      - name: Download & Extract Recovery ZIP
+        run: |
+          mkdir -p workspace/firmware
+          cd workspace/firmware
+          wget -O recovery.zip "${{ github.event.inputs.firmware_url }}"
+          unzip recovery.zip
+          
+          # Dump payload.bin to get system, vendor, etc.
+          if [ -f payload.bin ]; then
+            payload-dumper-go -o extracted_images payload.bin
+          fi
+          cd ../..
+
+      - name: Run aospdtgen
+        run: |
+          python3 -m aospdtgen workspace/firmware/extracted_images -o device/xiaomi/serenity
+
+      - name: Push Generated Tree to Repo
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git config --global user.name "GitHub Actions Bot"
+          git config --global user.email "actions@github.com"
+          git add device/
+          git commit -m "chore: auto-generate device tree from serenity recovery payload"
+          git push
+          
