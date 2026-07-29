@@ -23,10 +23,10 @@ jobs:
       - name: Install Tools (aospdtgen & payload-dumper)
         run: |
           pip install aospdtgen
-          # Download prebuilt payload-dumper-go v1.2.2 for Linux amd64
-          wget -O /tmp/payload-dumper-go.tar.gz https://release-assets.githubusercontent.com/github-production-release-asset/300937856/038f4f9e-b33a-4747-9eb2-3fc280545bd9?sp=r&sv=2018-11-09&sr=b&spr=https&se=2026-07-29T10%3A50%3A00Z&rscd=attachment%3B+filename%3Dpayload-dumper-go_1.3.0_linux_amd64.tar.gz&rsct=application%2Foctet-stream&skoid=96c2d410-5711-43a1-aedd-ab1947aa7ab0&sktid=398a6654-997b-47e9-b12b-9515b896b4de&skt=2026-07-29T09%3A49%3A50Z&ske=2026-07-29T10%3A50%3A00Z&sks=b&skv=2018-11-09&sig=sUv5WCs%2FiDWn6C9xKT2tdAeAykOErIu9pSJL6oLGtIg%3D&jwt=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJnaXRodWIuY29tIiwiYXVkIjoicmVsZWFzZS1hc3NldHMuZ2l0aHVidXNlcmNvbnRlbnQuY29tIiwia2V5Ijoia2V5MSIsImV4cCI6MTc4NTMyMDA4NCwibmJmIjoxNzg1MzE5Nzg0LCJwYXRoIjoicmVsZWFzZWFzc2V0cHJvZHVjdGlvbi5ibG9iLmNvcmUud2luZG93cy5uZXQifQ.4GF1CkWd3WUprufbS_JC7bwU9Ps3zx2UCw-3eLhMnjo&response-content-disposition=attachment%3B%20filename%3Dpayload-dumper-go_1.3.0_linux_amd64.tar.gz&response-content-type=application%2Foctet-stream
+          wget -O /tmp/payload-dumper-go.tar.gz https://github.com/ssut/payload-dumper-go/releases/download/v1.3.0/payload-dumper-go_1.3.0_linux_amd64.tar.gz
           tar -xzf /tmp/payload-dumper-go.tar.gz -C /tmp/
           sudo mv /tmp/payload-dumper-go /usr/local/bin/payload-dumper-go
+          
           
 
       - name: Download & Extract Recovery ZIP
