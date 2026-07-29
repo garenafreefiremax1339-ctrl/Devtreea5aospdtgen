@@ -1,12 +1,7 @@
-name: Generate AOSP Device Tree from Recovery ZIP
+name: Generate AOSP Device Tree
 
 on:
   workflow_dispatch:
-    inputs:
-        firmware_url:
-          description: 'Link download Recovery ROM (.zip)'
-          required: true
-          default: 'https://cdnorg.d.miui.com/A15.0.11.0.VGWIDXM/miui_SERENITYIDGlobal_A15.0.11.0.VGWIDXM_3c861cb965_15.0.zip'
 
 jobs:
   build:
@@ -20,26 +15,22 @@ jobs:
         with:
           python-version: '3.10'
 
-      - name: Install Tools (aospdtgen & payload-dumper)
+      - name: Install aospdtgen
         run: |
           pip install aospdtgen
-          wget -O /tmp/payload-dumper-go.tar.gz https://github.com/ssut/payload-dumper-go/releases/download/1.3.0/payload-dumper-go_1.3.0_linux_amd64.tar.gz
-          tar -xzf /tmp/payload-dumper-go.tar.gz -C /tmp/
-          sudo mv /tmp/payload-dumper-go /usr/local/bin/payload-dumper-go
-          
-          
 
-      - name: Download & Extract Recovery ZIP
+      - name: Run Payload Dumper & aospdtgen
         run: |
-          mkdir -p workspace/firmware
+          # Asumsi file payload.bin ada di folder workspace/firmware/
           cd workspace/firmware
-          wget -O recovery.zip "${{ github.event.inputs.firmware_url }}"
-          unzip recovery.zip
           
-          # Dump payload.bin to get system, vendor, etc.
-          if [ -f payload.bin ]; then
+          # Kalau payload-dumper-go udah lu sediakan atau mau dipanggil langsung
+          # Pastikan hasil dump masuk ke folder extracted_images
+          if [ ! -d "extracted_images" ]; then
+            mkdir -p extracted_images
             payload-dumper-go -o extracted_images payload.bin
           fi
+          
           cd ../..
 
       - name: Run aospdtgen
@@ -53,6 +44,6 @@ jobs:
           git config --global user.name "GitHub Actions Bot"
           git config --global user.email "actions@github.com"
           git add device/
-          git commit -m "chore: auto-generate device tree from serenity recovery payload"
+          git commit -m "chore: auto-generate device tree serenity"
           git push
           
