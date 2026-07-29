@@ -18,6 +18,26 @@ jobs:
       - name: Install aospdtgen
         run: |
           pip install aospdtgen
+          
+      - name: Extract ZIP & Run Payload Dumper
+        run: |
+          cd workspace/firmware
+          
+          # Ekstrak recovery.zip kalau payload.bin belum ada
+          if [ ! -f "payload.bin" ]; then
+            echo "Ekstrak recovery.zip..."
+            unzip -o recovery.zip
+          fi
+          
+          # Jalankan payload-dumper-go kalau folder extracted_images belum ada
+          if [ ! -d "extracted_images" ]; then
+            echo "Dumping payload.bin..."
+            mkdir -p extracted_images
+            payload-dumper-go -o extracted_images payload.bin
+          fi
+          
+          cd ../..
+          
 
       - name: Run Payload Dumper & aospdtgen
         run: |
